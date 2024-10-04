@@ -1,22 +1,41 @@
 import React, { useRef, useState, useEffect } from "react";
-import "./UploadPopup.css";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Button,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Typography,
+  IconButton,
+  CircularProgress,
+  Box,
+  List,
+  ListItem,
+  Card,
+  CardContent,
+  SelectChangeEvent,
+} from "@mui/material";
+import { Close, CloudUpload, FileCopy, PictureAsPdf, Description } from "@mui/icons-material";
+import { InsertChart, InsertPhoto } from "@mui/icons-material"; // For Excel, PowerPoint, etc.
 import axios from "axios";
 import API_BASE_URL from "../../config";
 
 interface UploadPopupProps {
   onClose: () => void;
   onUploadConfirm: (files: File[], category: string) => void;
-  initialSelectedFiles: File[]; // New prop for initial files
+  initialSelectedFiles: File[];
 }
 
 const UploadPopup: React.FC<UploadPopupProps> = ({ onClose, onUploadConfirm, initialSelectedFiles }) => {
-  const [selectedFiles, setSelectedFiles] = useState<File[]>(initialSelectedFiles); // Initialize with passed files
+  const [selectedFiles, setSelectedFiles] = useState<File[]>(initialSelectedFiles);
   const [category, setCategory] = useState<string>("default");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [uploading, setUploading] = useState<boolean>(false); 
-  const [errorMessage, setErrorMessage] = useState<string | null>(null); 
-  const [documentGroups, setDocumentGroups] = useState<string[]>([]); 
-  const [dragging, setDragging] = useState(false);
+  const [uploading, setUploading] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [documentGroups, setDocumentGroups] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchDocumentGroups = async () => {
@@ -36,7 +55,7 @@ const UploadPopup: React.FC<UploadPopupProps> = ({ onClose, onUploadConfirm, ini
     setSelectedFiles(files);
   };
 
-  const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleCategoryChange = (event: SelectChangeEvent<string>) => {
     setCategory(event.target.value);
   };
 
@@ -50,12 +69,12 @@ const UploadPopup: React.FC<UploadPopupProps> = ({ onClose, onUploadConfirm, ini
     formData.append("document_group_name", category);
 
     try {
-      setUploading(true); 
+      setUploading(true);
       setErrorMessage(null);
 
       const response = await axios.post(`${API_BASE_URL}/upload`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
 
@@ -66,7 +85,7 @@ const UploadPopup: React.FC<UploadPopupProps> = ({ onClose, onUploadConfirm, ini
       console.error("Error uploading files:", error);
       setErrorMessage("Failed to upload files. Please try again.");
     } finally {
-      setUploading(false); 
+      setUploading(false);
     }
   };
 
@@ -78,92 +97,170 @@ const UploadPopup: React.FC<UploadPopupProps> = ({ onClose, onUploadConfirm, ini
     }
   };
 
-  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragging(true);
-  };
+  // Utility function to get icon based on file type
+  const getFileIcon = (fileName: string) => {
+    const fileExtension = fileName.split(".").pop()?.toLowerCase();
 
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragging(false);
+    switch (fileExtension) {
+      case "pdf":
+        return <PictureAsPdf sx={{ color: "#D32F2F", mr: 1 }} />;
+      case "doc":
+      case "docx":
+        return <Description sx={{ color: "#2196F3", mr: 1 }} />;
+      case "xls":
+      case "xlsx":
+        return <InsertChart sx={{ color: "#4CAF50", mr: 1 }} />;
+      case "ppt":
+      case "pptx":
+        return <InsertPhoto sx={{ color: "#FF9800", mr: 1 }} />;
+      default:
+        return <FileCopy sx={{ color: "#757575", mr: 1 }} />;
+    }
   };
 
   return (
-    <div 
-      className={`popup-overlay ${dragging ? "dragging" : ""}`}
-      onDragEnter={handleDragEnter}
-      onDragLeave={handleDragLeave}
+    <Dialog
+      open
+      onClose={onClose}
+      fullWidth
+      maxWidth='sm'
+      PaperProps={{
+        sx: {
+          borderRadius: "12px",
+        },
+      }}
     >
-      <div className="popup-container">
-        <h2>파일 업로드</h2>
-        <div className="popup-body">
-          <div className="dropdown-container">
-            <label htmlFor="category-select">
-              <h3>문서 위치</h3>
-            </label>
-            <select
-              className="category-select"
-              id="category-select"
-              value={category}
-              onChange={handleCategoryChange}
-            >
-              <option value="default">문서 그룹</option>
-              {documentGroups.map((group, index) => (
-                <option key={index} value={group}>
-                  {group}
-                </option>
-              ))}
-            </select>
-          </div>
+      <Card sx={{ boxShadow: 8, p: 2 }}>
+        <DialogTitle>
+          <Box display='flex' justifyContent='space-between' alignItems='center'>
+            <Typography variant='h5' fontWeight='bold'>
+              파일 업로드
+            </Typography>
+            <IconButton onClick={onClose}>
+              <Close />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <CardContent>
+            <Box display='flex' flexDirection='column' gap={3}>
+              {/* Document Category Selection */}
+              <FormControl fullWidth variant='outlined'>
+                <InputLabel id='category-label'>문서 그룹 선택</InputLabel>
+                <Select
+                  labelId='category-label'
+                  value={category}
+                  onChange={handleCategoryChange}
+                  label='문서 그룹 선택'
+                  sx={{
+                    borderRadius: 2,
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": {
+                        borderColor: "lightgray",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#3f51b5",
+                      },
+                    },
+                  }}
+                >
+                  <MenuItem value='default'>문서 그룹</MenuItem>
+                  {documentGroups.map((group, index) => (
+                    <MenuItem key={index} value={group}>
+                      {group}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
 
-          <div className="upload-button-container">
-            <h3>파일</h3>
-            <div className="upload-button-and-text">
-              <button
-                type="button"
-                className="upload-button-pop-up"
+              {/* File Upload Section */}
+              <Box
+                sx={{
+                  border: "2px dashed #ddd",
+                  borderRadius: 2,
+                  p: 9,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textAlign: "center",
+                  cursor: "pointer",
+                  transition: "0.3s",
+                  "&:hover": {
+                    backgroundColor: "#f5f5f5",
+                  },
+                }}
                 onClick={() => fileInputRef.current?.click()}
               >
-                파일 선택
-              </button>
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileSelection}
-                multiple
-                style={{ display: "none" }}
-              />
-              <p>{selectedFiles.length > 0 ? `${selectedFiles.length} 파일 선택됨` : "선택된 파일 없음"}</p>
-            </div>
-          </div>
+                <CloudUpload sx={{ mr: 1, fontSize: 40, color: "#3f51b5" }} />
+                <Typography>
+                  {selectedFiles.length > 0
+                    ? `${selectedFiles.length} 파일 선택됨`
+                    : "클릭하여 파일을 선택하거나 끌어다 놓으세요"}
+                </Typography>
+                <input type='file' ref={fileInputRef} onChange={handleFileSelection} multiple hidden />
+              </Box>
 
-          {selectedFiles.length > 0 && (
-            <div className="selected-files">
-              <p>선택된 파일:</p>
-              <ul>
-                {selectedFiles.map((file, index) => (
-                  <li key={index}>{file.name}</li>
-                ))}
-              </ul>
-            </div>
-          )}
+              {/* Selected Files List */}
+              {selectedFiles.length > 0 && (
+                <List
+                  sx={{
+                    border: "1px solid #ddd",
+                    borderRadius: 2,
+                    maxHeight: "150px",
+                    overflow: "auto",
+                    p: 1,
+                  }}
+                >
+                  {selectedFiles.map((file, index) => (
+                    <ListItem key={index} sx={{ display: "flex", alignItems: "center" }}>
+                      {getFileIcon(file.name)}
+                      <Typography>{file.name}</Typography>
+                    </ListItem>
+                  ))}
+                </List>
+              )}
 
-          {uploading && <p>업로드 중...</p>}
-          {errorMessage && <p className="error-message">{errorMessage}</p>}
-        </div>
+              {/* Loading Spinner */}
+              {uploading && (
+                <Box display='flex' alignItems='center' gap={1}>
+                  <CircularProgress size={24} />
+                  <Typography>업로드 중...</Typography>
+                </Box>
+              )}
+              {errorMessage && (
+                <Typography color='error' variant='body2'>
+                  {errorMessage}
+                </Typography>
+              )}
 
-        <div className="popup-footer">
-          <button className="confirm-button" onClick={handleConfirm} disabled={uploading}>
-            {uploading ? "업로드 중..." : "업로드"}
-          </button>
-          <button className="cancel-button" onClick={onClose} disabled={uploading}>
-            취소
-          </button>
-        </div>
-      </div>
-    </div>
+              {/* Action Buttons */}
+              <Box display='flex' justifyContent='space-evenly' gap={2} mt={2}>
+                <Button
+                  variant='contained'
+                  color='primary'
+                  size='medium'
+                  sx={{ borderRadius: 2, width: 150, height: 45 }}
+                  onClick={handleConfirm}
+                  disabled={uploading || selectedFiles.length === 0 || category === "default"}
+                >
+                  {uploading ? "업로드 중..." : "업로드"}
+                </Button>
+                <Button
+                  variant='contained'
+                  color='error'
+                  size='medium'
+                  sx={{ borderRadius: 2, width: 150, height: 45 }}
+                  onClick={onClose}
+                  disabled={uploading}
+                >
+                  취소
+                </Button>
+              </Box>
+            </Box>
+          </CardContent>
+        </DialogContent>
+      </Card>
+    </Dialog>
   );
 };
 

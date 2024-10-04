@@ -6,8 +6,7 @@ import "./SearchForm.css";
 import API_BASE_URL from "../../config.ts"; // Import the API base URL
 import Spinner from "../Spinner/Spinner";
 // import { fetchAuthSession } from "aws-amplify/auth";
-import { EventSourcePolyfill } from 'event-source-polyfill';
-
+import { EventSourcePolyfill } from "event-source-polyfill";
 
 const SearchForm: React.FC = () => {
   const [query, setQuery] = useState<string>("");
@@ -18,9 +17,7 @@ const SearchForm: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const [retrievedChunks, setRetrievedChunks] = useState<any[]>([]);
-  const [generatedResponse, setGeneratedResponse] = useState<string | null>(
-    null
-  ); // Store generated response
+  const [generatedResponse, setGeneratedResponse] = useState<string | null>(null); // Store generated response
   const [chatStrid, setChatStrid] = useState<string | null>(null); // Store the chat_strid
 
   const navigate = useNavigate();
@@ -78,11 +75,11 @@ const SearchForm: React.FC = () => {
 
       // const idToken = session?.tokens?.idToken?.toString() || "";
       const eventSource = new EventSourcePolyfill(
-        `${API_BASE_URL}/search?chat_strid=${chatStrid}`,
+        `${API_BASE_URL}/search?chat_strid=${chatStrid}`
         // {
-          // headers: {
-            // 'Authorization': `Bearer ${idToken}`
-          // }
+        // headers: {
+        // 'Authorization': `Bearer ${idToken}`
+        // }
         // }
       );
 
@@ -137,9 +134,9 @@ const SearchForm: React.FC = () => {
   // }
 
   return (
-    <div className="form-container">
+    <div className='form-container'>
       <form onSubmit={onSubmit}>
-        <div className="input-wrapper">
+        <div className='input-wrapper'>
           {/* Dropdown for language selection */}
           {/* <select
             id="language-select"
@@ -171,28 +168,27 @@ const SearchForm: React.FC = () => {
 
           {/* Input for query */}
           <input
-            type="text"
+            type='text'
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="질문을 입력하세요."
-            className="search-input"
+            placeholder='질문을 입력하세요.'
+            className='search-input'
           />
 
           {/* Submit Button */}
-          <div className="submit-button">
+          <div className='submit-button'>
             <SubmitButton />
           </div>
         </div>
       </form>
-      
+
       {loading && (
-          <div className="spinner-container">
-            <Spinner />
-          </div>
-        )}
+        <div className='spinner-container'>
+          <Spinner />
+        </div>
+      )}
 
-
-      {error && <p className="error">{error}</p>}
+      {error && <p className='error'>{error}</p>}
     </div>
   );
 };

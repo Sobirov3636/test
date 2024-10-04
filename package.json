@@ -15,6 +15,10 @@
   "dependencies": {
     "@aws-amplify/auth": "^6.4.0",
     "@aws-amplify/ui-react": "^6.3.0",
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@mui/icons-material": "^6.1.1",
+    "@mui/material": "^6.1.1",
     "@types/event-source-polyfill": "^1.0.5",
     "@types/react-router-dom": "^5.3.3",
     "aws-amplify": "^6.6.0",

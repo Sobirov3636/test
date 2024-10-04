@@ -1,138 +1,196 @@
 import React from "react";
 import "./Profile.css";
 import { useNavigate } from "react-router-dom";
-import DocumentUpload from "../../components/DocumentUpload/DocumentUpload";
+import { ReactComponent as Logo } from "../../assets/Logo.svg";
 import FileManager from "../../components/FileManager/FileManager";
-// import ProfileIcon from "../../assets/Profile/ProfileIcon";
-// import ToggleIcon from "../../assets/Profile/ToggleIcon";
-// import UploadIconSmall from "../../assets/Profile/UploadIconSmall";
-// import SearchIcon from "../../assets/Profile/SearchIcon";
-// import FileSearch from "../../components/FileSearch/FileSearch";
-import GoBackArrow from "../../assets/Profile/GoBackArrow";
+import {
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  IconButton,
+  Toolbar,
+  Typography,
+  ListItemButton,
+  Box,
+  AppBar,
+  useMediaQuery,
+  MenuItem,
+  Menu,
+} from "@mui/material";
+import HomeIcon from "@mui/icons-material/Home";
+import FileCopyIcon from "@mui/icons-material/FileCopy";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import SettingsIcon from "@mui/icons-material/Settings";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { AccountCircle } from "@mui/icons-material";
 
 const Profile: React.FC = () => {
+  // const [auth, setAuth] = React.useState(true);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  // const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   setAuth(event.target.checked);
+  // };
+
+  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   const navigate = useNavigate();
-  // const [showButtons, setShowButtons] = useState<boolean>(false); // Toggle the visibility of extra buttons
-  // const [selectedOption, setSelectedOption] = useState<string>(""); // Track selected option
 
-  const userProfile = () => {
-    navigate("/profile");
-  };
+  const isSmallScreen = useMediaQuery("(max-width: 768px)");
 
-  const handleFilesUpload = (files: File[]) => {
-    console.log("Uploaded files:", files);
-  };
+  const drawerWidth = isSmallScreen ? 60 : 300;
 
-  // const toggleButtons = () => {
-  //   setShowButtons(!showButtons); // Toggle showing the extra buttons
-  //   setSelectedOption("toggle");
-  // };
-
-  // const profileButtons = () => {
-  //   setSelectedOption("profile");
-  //   setShowButtons(false);
-  // };
-
-  // const handleOptionClick = (option: string) => {
-  //   setSelectedOption(option);
-  // };
+  const menuItems = [
+    { text: "Overview", icon: <HomeIcon />, onClick: () => navigate("/overview") },
+    { text: "Files", icon: <FileCopyIcon />, onClick: () => navigate("/files") },
+    { text: "Plans & Billing", icon: <AccountBalanceWalletIcon />, onClick: () => navigate("/billing") },
+    { text: "Settings", icon: <SettingsIcon />, onClick: () => navigate("/settings") },
+  ];
 
   const navigateHome = () => {
     navigate("/");
   };
 
   return (
-    <div className="profile-page-container custom-scrollbar">
-      <div className="top-navigation-bar">
-        <button className="top-profile-button" onClick={userProfile} />
-      </div>
-
-      <div className="profile-page-side-menu">
-        <div className="company-logo" />
-        {/* Field Test Upload Button Only */}
-        {/* <button className="selected">
-          <UploadIconSmall />
-          파일 업로드
-        </button> */}
-
-        {/* Toggle Button */}
-        {/* <button
-            className={`toggle-button ${
-              selectedOption === "toggle" || showButtons ? "selected" : ""
-            }`}
-            onClick={toggleButtons}
-          >
-            <ToggleIcon />
-            문서 관리
+    <div className='profile-page-container custom-scrollbar'>
+      {/* Top Navigation Bar */}
+      <AppBar
+        position='fixed'
+        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, background: "rgba(26, 31, 43, 0.62);" }}
+      >
+        <Toolbar sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
+            <Logo style={{ height: "35px", width: "35px" }} />
+            <Typography variant='h6' noWrap component='div'>
+              PhnyX RAG
+            </Typography>
+          </Box>
+          {/* <button className='top-profile-button' onClick={() => navigate("/profile")}>
           </button> */}
 
-        {/* Show the two buttons below the toggle button and above the profile button */}
-        {/* {showButtons && (
-            <div className="dropdown-options">
-              <button
-                className={selectedOption === "Option 1" ? "selected" : ""}
-                onClick={() => handleOptionClick("Option 1")}
-              >
-                <UploadIconSmall />
-                파일 업로드
-              </button>
-              <button
-                className={selectedOption === "Option 2" ? "selected" : ""}
-                onClick={() => handleOptionClick("Option 2")}
-              >
-                <SearchIcon />
-                문서 검색
-              </button>
-            </div>
-          )} */}
+          <div>
+            <IconButton
+              size='large'
+              aria-label='account of current user'
+              aria-controls='menu-appbar'
+              aria-haspopup='true'
+              onClick={handleMenu}
+              color='inherit'
+              sx={{ height: "0px" }}
+            >
+              <AccountCircle sx={{ height: "40px", width: "40px" }} />
+            </IconButton>
+            <Menu
+              id='menu-appbar'
+              anchorEl={anchorEl}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+            >
+              <MenuItem onClick={() => navigate("/profile")}>Profile</MenuItem>
+              <MenuItem onClick={handleClose}>My account</MenuItem>
+            </Menu>
+          </div>
+        </Toolbar>
+      </AppBar>
 
-        {/* Profile Button */}
-        {/* <button
-            className={`profile-button ${
-              selectedOption === "profile" ? "selected" : ""
-            }`}
-            onClick={profileButtons}
+      {/* Sidebar Drawer */}
+      <Drawer
+        variant='permanent'
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          "& .MuiDrawer-paper": {
+            width: drawerWidth,
+            boxSizing: "border-box",
+            backgroundColor: "#FFF",
+            boxShadow: "0px 0px 2vw 0px rgba(0, 0, 0, 0.10)",
+            top: "64px",
+            overflowX: "hidden",
+          },
+        }}
+      >
+        {/* Drawer Content */}
+        <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+          {/* Menu Items */}
+          <List sx={{ marginTop: "50px" }}>
+            {menuItems.map((item, index) => (
+              <ListItem key={index} disablePadding>
+                <ListItemButton onClick={item.onClick}>
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  {!isSmallScreen && <ListItemText primary={item.text} />}
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+          {/* Go Back Section */}
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: "10%",
+              left: 0,
+              right: 0,
+              padding: 2,
+              display: "flex",
+              justifyContent: "center",
+            }}
           >
-            <ProfileIcon />
-            유저 관리
-          </button> */}
+            <IconButton
+              onClick={navigateHome}
+              sx={{
+                width: "85%",
+                height: 50,
+                justifyContent: "center",
+                backgroundColor: "#F6F7FA",
+                color: "#000",
+                borderRadius: 2,
+                boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+                "&:hover": {
+                  backgroundColor: "#27065d",
+                  color: "white",
+                  "& .MuiTypography-root": {
+                    color: "white",
+                  },
+                  "& .MuiSvgIcon-root": {
+                    color: "white",
+                  },
+                },
+              }}
+            >
+              <ArrowBackIcon />
+              {!isSmallScreen && (
+                <Typography
+                  variant='body1'
+                  sx={{
+                    marginLeft: 1,
+                  }}
+                >
+                  Go Back
+                </Typography>
+              )}
+            </IconButton>
+          </Box>
+        </Box>
+      </Drawer>
 
-        <div className="return-home-button">
-          <button onClick={navigateHome}>
-            <GoBackArrow />
-            PhnyX RAG 검색
-          </button>
-        </div>
+      {/* Main Content */}
+      <div className='profile-page-body-container' style={{ marginLeft: drawerWidth }}>
+        <FileManager />
       </div>
-
-      <div className="profile-page-body-container">
-        <h1>파일 업로드</h1>
-        <>
-          <DocumentUpload onFilesUpload={handleFilesUpload} />
-          <FileManager />
-        </>
-      </div>
-
-      {/* Conditionally show content based on selected option */}
-      {/* {selectedOption && (
-        <div className="profile-page-body-container">
-          <h1>
-            {(showButtons === true &&
-              (selectedOption === "Option 1" ? "파일 업로드" : "")) ||
-              (selectedOption === "Option 2" ? "문서 탐색" : "")}
-          </h1>
-
-          {selectedOption === "Option 1" && showButtons === true && (
-            <>
-              <DocumentUpload onFilesUpload={handleFilesUpload} />
-              <FileManager />
-            </>
-          )}
-          {selectedOption === "Option 2" && showButtons === true && (
-            <FileSearch />
-          )}
-        </div>
-      )} */}
     </div>
   );
 };

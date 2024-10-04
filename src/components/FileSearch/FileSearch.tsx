@@ -32,14 +32,12 @@ const FileSearch: React.FC = () => {
 
     return new Date(year, month, day, hour, minute, second);
   };
-  
+
   // Fetch files from API on component mount
   useEffect(() => {
     const fetchFiles = async () => {
       try {
-        const response = await axios.get(
-          `${API_BASE_URL}/list_recent_file_uploads`
-        );
+        const response = await axios.get(`${API_BASE_URL}/list_recent_file_uploads`);
         const fetchedFiles = response.data.documents.map((doc: any) => ({
           name: doc.original_name,
           documentGroup: doc.document_group_name,
@@ -66,23 +64,17 @@ const FileSearch: React.FC = () => {
 
     // Apply search filter
     if (searchTerm) {
-      filteredFiles = filteredFiles.filter((file) =>
-        file.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      filteredFiles = filteredFiles.filter((file) => file.name.toLowerCase().includes(searchTerm.toLowerCase()));
     }
 
     // Apply document group filter
     if (documentGroupFilter) {
-      filteredFiles = filteredFiles.filter(
-        (file) => file.documentGroup === documentGroupFilter
-      );
+      filteredFiles = filteredFiles.filter((file) => file.documentGroup === documentGroupFilter);
     }
 
     // Apply file type filter (mocking with "PDF" as all are PDFs for now)
     if (fileTypeFilter === "PDF") {
-      filteredFiles = filteredFiles.filter((file) =>
-        file.name.endsWith(".pdf")
-      );
+      filteredFiles = filteredFiles.filter((file) => file.name.endsWith(".pdf"));
     }
 
     return [...filteredFiles].sort((a, b) => {
@@ -107,56 +99,56 @@ const FileSearch: React.FC = () => {
   };
 
   return (
-    <div className="file-search-container">
+    <div className='file-search-container'>
       {/* First row: Search, search button, document group filter, and file type filter */}
-      <div className="file-search-filters">
+      <div className='file-search-filters'>
         <input
-          type="text"
-          className="search-bar"
-          placeholder="키워드 검색"
+          type='text'
+          className='search-bar'
+          placeholder='키워드 검색'
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
 
-        <div className="select-and-search-container">
+        <div className='select-and-search-container'>
           <select
-            className="document-group-filter"
+            className='document-group-filter'
             value={documentGroupFilter}
             onChange={(e) => setDocumentGroupFilter(e.target.value)}
           >
-            <option value="">문서 그룹</option> {/*document group*/}
-            <option value="Group 1">Group 1</option>
-            <option value="Group 2">Group 2</option>
-            <option value="Group 3">Group 3</option>
+            <option value=''>문서 그룹</option> {/*document group*/}
+            <option value='Group 1'>Group 1</option>
+            <option value='Group 2'>Group 2</option>
+            <option value='Group 3'>Group 3</option>
           </select>
 
           <select
-            className="file-type-filter"
+            className='file-type-filter'
             value={fileTypeFilter}
             onChange={(e) => setFileTypeFilter(e.target.value)}
           >
-            <option value="">문서 유형</option> {/*file group*/}
-            <option value="PDF">PDF</option>
-            <option value="DOC">DOC</option>
+            <option value=''>문서 유형</option> {/*file group*/}
+            <option value='PDF'>PDF</option>
+            <option value='DOC'>DOC</option>
           </select>
 
-          <button className="search-button" onClick={() => sortedFiles()}>
+          <button className='search-button' onClick={() => sortedFiles()}>
             검색
           </button>
         </div>
       </div>
 
       {/* Second row: Sort order and view toggle */}
-      <div className="file-search-header">
-        <div className="header-buttons-container">
+      <div className='file-search-header'>
+        <div className='header-buttons-container'>
           <select onChange={handleSortChange} value={sortOrder}>
-            <option value="latest">정렬 기준</option>
-            <option value="earliest">Earliest Uploaded</option>
-            <option value="az">Alphabetical A-Z</option>
-            <option value="za">Alphabetical Z-A</option>
+            <option value='latest'>정렬 기준</option>
+            <option value='earliest'>Earliest Uploaded</option>
+            <option value='az'>Alphabetical A-Z</option>
+            <option value='za'>Alphabetical Z-A</option>
           </select>
 
-          <div className="view-buttons">
+          <div className='view-buttons'>
             <button onClick={() => handleViewChange("list")}>
               <List />
             </button>
@@ -170,38 +162,32 @@ const FileSearch: React.FC = () => {
       {/* File list */}
       <div className={`file-search-content ${view}`}>
         {view === "list" && (
-          <div className="file-search-content-header">
-            <div className="header-name">이름</div>
-            <div className="header-group">문서 그룹</div>
-            <div className="header-date">업로드 날짜</div>
-            <div className="header-place-holder" />
+          <div className='file-search-content-header'>
+            <div className='header-name'>이름</div>
+            <div className='header-group'>문서 그룹</div>
+            <div className='header-date'>업로드 날짜</div>
+            <div className='header-place-holder' />
           </div>
         )}
 
         {sortedFiles().map((file, index) => (
           <div className={`file-item ${view}`} key={index}>
             {/* Left section with icon and name */}
-            <div className="file-info">
-              <div className="file-icon">
+            <div className='file-info'>
+              <div className='file-icon'>
                 <PDFIcon />
               </div>
-              <p className="file-name">{file.name}</p>
+              <p className='file-name'>{file.name}</p>
             </div>
 
             {/* Middle section with document group */}
-            {view === "list" && (
-              <p className="document-group">{file.documentGroup}</p>
-            )}
+            {view === "list" && <p className='document-group'>{file.documentGroup}</p>}
 
             {/* Right section with upload date */}
-            {view === "list" && (
-              <p className="upload-date">
-                {file.uploadDate.toLocaleDateString()}
-              </p>
-            )}
+            {view === "list" && <p className='upload-date'>{file.uploadDate.toLocaleDateString()}</p>}
 
             {/* Three dots for more options */}
-            <div className="more-options">
+            <div className='more-options'>
               <ThreeDots />
             </div>
           </div>
